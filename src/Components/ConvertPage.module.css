@@ -1,0 +1,98 @@
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+.container{
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.header{
+    height: 10vh;
+    background-color: #2a314b;
+    color: #fff;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.header_rates{
+    display: flex;
+    justify-content: space-between;
+    width: 50%;
+    max-width: 35vw;
+}
+
+.main{
+    margin-top: 20vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 10vh;
+    width: 80vw;
+}
+
+.currency_block{
+    display: flex;
+    justify-content: space-between;
+    width: 80%;
+    max-width: 400px;
+}
+
+.currency_block input{
+    height: 3vh;
+    width: 60%;
+    padding-left: 0.5em;
+    border-radius: 10px;
+}
+
+.currency_block select{
+    width:30%;
+    text-align: center;
+    border-radius: 10px;
+}
+
+@media (min-width: 1020px) {
+    .container{
+        font-size: 1.4rem;
+    }
+    input, select{
+        font-size: 1.2rem;
+        padding: 5px;
+    }
+    .main{
+        height: 20vh;
+    }
+    .currency_block{
+        max-width: 700px;
+    }
+    .currency_block input{
+        height: 5vh;
+    }
+}
+
+@media (max-width: 580px) {
+    .header_rates{
+        width: 50%;
+        max-width: 40vw;
+    }
+}
+
+@media (max-width: 480px) {
+    .header_rates{
+        width: 60%;
+        max-width: 65vw;
+        font-size: 0.9rem;
+    }
+}
