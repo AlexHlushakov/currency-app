@@ -8,3 +8,5 @@ App is written on React with React hooks such as: useState, useEffect, React.Mem
 For GET request to the API, I used Axios.
 
 API provider is: https://exchangerate.host/
+
+Hosted build oa the app at: https://exhange-rate-app.netlify.app

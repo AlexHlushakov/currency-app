@@ -61,6 +61,15 @@ input[type=number] {
     width:30%;
     text-align: center;
     border-radius: 10px;
+    appearance: none;
+    -webkit-appearance: none;
+    color: #fff;
+    cursor: pointer;
+    background-color: #4a6d88;
+}
+
+.currency_block select:hover{
+    background-color: #f17c37;
 }
 
 @media (min-width: 1020px) {
