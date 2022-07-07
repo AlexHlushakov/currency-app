@@ -11,7 +11,7 @@ type PropsType = {
 }
 
 
-const Header: React.FC<PropsType> = (props) =>{
+const Header: React.FC<PropsType> = React.memo((props) =>{
 
     return (
         <header className={styles.header}>
@@ -25,7 +25,7 @@ const Header: React.FC<PropsType> = (props) =>{
             </div>
         </header>
     )
-}
+})
 
 const ConvertPage: React.FC =() =>{
 
