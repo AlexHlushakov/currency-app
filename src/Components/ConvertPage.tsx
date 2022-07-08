@@ -31,12 +31,12 @@ const ConvertPage: React.FC =() =>{
 
     //  useState Data
 
-    let [loading, setLoading] = useState(true);
-    let [rates, setRates] = useState({USD:{},EUR:{},UAH:{}});
+    const [loading, setLoading] = useState(true);
+    const [rates, setRates] = useState({USD:{},EUR:{},UAH:{}});
     const currencies: Array<string> = ["USD", "EUR", "UAH"]
 
-    let [currencyOne, setCurrencyOne] = useState({currency: currencies[0], amount: 0})
-    let [currencyTwo, setCurrencyTwo] = useState({currency: currencies[2], amount: 0})
+    const [currencyOne, setCurrencyOne] = useState({currency: currencies[0], amount: 0})
+    const [currencyTwo, setCurrencyTwo] = useState({currency: currencies[2], amount: 0})
 
 
 
