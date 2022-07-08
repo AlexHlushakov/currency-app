@@ -35,8 +35,8 @@ const ConvertPage: React.FC =() =>{
     let [rates, setRates] = useState({USD:{},EUR:{},UAH:{}});
     const currencies: Array<string> = ["USD", "EUR", "UAH"]
 
-    let [currencyOne, setCurrencyOne] = useState({currency: currencies[0], amount: 1})
-    let [currencyTwo, setCurrencyTwo] = useState({currency: currencies[2], amount: 1})
+    let [currencyOne, setCurrencyOne] = useState({currency: currencies[0], amount: 0})
+    let [currencyTwo, setCurrencyTwo] = useState({currency: currencies[2], amount: 0})
 
 
 
