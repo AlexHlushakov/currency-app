@@ -3,11 +3,13 @@ import React, {useEffect, useState} from 'react';
 import {RatesAPI} from '../api/api';
 // @ts-ignore
 import styles from './ConvertPage.module.css'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 
 type PropsType = {
-    usd: Object
-    eur: Object
+    rates: {}
 }
 
 
@@ -17,10 +19,10 @@ const Header: React.FC<PropsType> = React.memo((props) =>{
         <header className={styles.header}>
             <div className={styles.header_rates}>
                 <div>
-                    <b>USD:</b><span>{props.usd.UAH}</span>
+                    <b>USD:</b><span>{props.rates.USD.UAH}</span>
                 </div>
                 <div>
-                    <b>EUR:</b><span>{props.eur.UAH}</span>
+                    <b>EUR:</b><span>{props.rates.EUR.UAH}</span>
                 </div>
             </div>
         </header>
@@ -29,11 +31,24 @@ const Header: React.FC<PropsType> = React.memo((props) =>{
 
 const ConvertPage: React.FC =() =>{
 
+    const notify = () => toast.error("Too Big Amount!");
+
     //  useState Data
+    let currencies: Array<string> = ["USD", "EUR", "UAH", "RUB", "CNY"]
+
+    let inputRegex = /^\d{0,11}$/;
+
+    const createRatesObject  = (keys: Array<string>) => {
+        return keys.reduce((accumulator, value) => {
+            return {...accumulator, [value]: keys.reduce((accumulator, value) => {
+                    return {...accumulator, [value]: 0};
+                }, {})};
+        }, {})
+    }
 
     const [loading, setLoading] = useState(true);
-    const [rates, setRates] = useState({USD:{},EUR:{},UAH:{}});
-    const currencies: Array<string> = ["USD", "EUR", "UAH"]
+    // const [rates, setRates] = useState({USD:{},EUR:{},UAH:{}});
+    const [rates, setRates] = useState(createRatesObject(currencies))
 
     const [currencyOne, setCurrencyOne] = useState({currency: currencies[0], amount: 0})
     const [currencyTwo, setCurrencyTwo] = useState({currency: currencies[2], amount: 0})
@@ -44,19 +59,22 @@ const ConvertPage: React.FC =() =>{
 
     useEffect(() =>{
 
-        let newRates ={USD:{},EUR:{},UAH:{}}
+        let newRates = createRatesObject(currencies);
 
         let getRates = async () => {
             setLoading(true)
            try{
-                let usdRates: Object  = await RatesAPI.getRate("USD", ["UAH", "EUR", "USD"]);
-               let eurRates: Object  = await RatesAPI.getRate("EUR", ["UAH", "USD", "EUR"]);
-               let uahRates: Object  = await RatesAPI.getRate("UAH", ["USD", "EUR", "UAH"]);
-                Promise.all([usdRates, eurRates, uahRates]).then(()=>{
-                    newRates.USD = usdRates;
-                    newRates.EUR = eurRates;
-                    newRates.UAH = uahRates;
-                })
+                let promises = [];
+                for(let i = 0; i < currencies.length; i++) {
+                    let result = await RatesAPI.getRate(currencies[i], currencies);
+                    promises.push(result);
+                    }
+               Promise.all(promises).then(()=>{
+                   for(let i = 0; i < currencies.length; i++) {
+                       let key = currencies[i];
+                       newRates[key] = promises[i];
+                   }
+               })
            } catch (error){
                console.error(error.message);
            }
@@ -97,37 +115,24 @@ const ConvertPage: React.FC =() =>{
                 break;
             }
             case 'inputOne':{
-                setCurrencyTwo({currency: currencyTwo.currency, amount: parseFloat((convert(currencyOne.currency, event.target.value, currencyTwo.currency)).toFixed(3))})
-                break;
-            }
-            case 'inputTwo':{
-                setCurrencyOne({currency: currencyOne.currency, amount: parseFloat((convert(currencyOne.currency, null, currencyTwo.currency, event.target.value)).toFixed(3))})
-                break;
-            }
-            default:{
-                break;
-            }
-        }
-    }
-
-
-    const handleChangeInput= (oneOrTwo: string) => (event) => {
-        switch (oneOrTwo) {
-            case 'one': {
-                if (event.target.value > 9999999999) {
-                    alert("Invalid input range. Max value is 9999999999")
+                if (!inputRegex.test(event.target.value.toString()) && currencyOne.amount < event.target.value) {
+                    console.log(event.target.value)
+                    notify()
                     break;
                 } else {
                     setCurrencyOne({currency: currencyOne.currency, amount: event.target.value});
+                    setCurrencyTwo({currency: currencyTwo.currency, amount: parseFloat((convert(currencyOne.currency, event.target.value, currencyTwo.currency)).toFixed(3))})
                     break;
                 }
             }
-            case 'two': {
-                if (event.target.value > 9999999999) {
-                    alert("Invalid input range. Max value is 9999999999")
+            case 'inputTwo':{
+                if (!inputRegex.test(event.target.value.toString()) && currencyTwo.amount < event.target.value) {
+                    console.log(event.target.value)
+                    notify()
                     break;
                 } else {
                     setCurrencyTwo({currency: currencyTwo.currency, amount: event.target.value});
+                    setCurrencyOne({currency: currencyOne.currency, amount: parseFloat((convert(currencyOne.currency, null, currencyTwo.currency, event.target.value)).toFixed(3))})
                     break;
                 }
             }
@@ -145,10 +150,11 @@ const ConvertPage: React.FC =() =>{
     } else{
         return(
             <div className={styles.container}>
-                <Header usd={rates.USD} eur={rates.EUR}/>
+                <Header rates={rates}/>
                 <main className={styles.main}>
                     <div className={styles.currency_block}>
-                        <input type="number" name="amountOne" value={currencyOne.amount} onChange={handleChangeInput("one")} onBlur={handleChangeAndConvert('inputOne')} />
+                        <input type="number" name="amountOne" value={currencyOne.amount !== 0 ? currencyOne.amount : ''}
+                               onChange={handleChangeAndConvert('inputOne')}  placeholder='Enter amount'/>
                         <select value={currencyOne.currency} onChange={handleChangeAndConvert('selectOne')}>
                             {currencies.map(option=>(
                                 <option key={option} value={option}>{option}</option>
@@ -156,7 +162,8 @@ const ConvertPage: React.FC =() =>{
                         </select>
                     </div>
                     <div className={styles.currency_block}>
-                        <input type="number" name="amountTwo" value={currencyTwo.amount}  onChange={handleChangeInput("two")} onBlur={handleChangeAndConvert('inputTwo')} />
+                        <input type="number" name="amountTwo" value={currencyTwo.amount !== 0 ? currencyTwo.amount : ''}
+                               onChange={handleChangeAndConvert('inputTwo')} placeholder='Enter amount' />
                         <select value={currencyTwo.currency} onChange={handleChangeAndConvert('selectTwo')}>
                             {currencies.map(option=>(
                                 <option key={option} value={option}>{option}</option>
@@ -164,6 +171,7 @@ const ConvertPage: React.FC =() =>{
                         </select>
                     </div>
                 </main>
+                <ToastContainer />
             </div>
         )
     }
