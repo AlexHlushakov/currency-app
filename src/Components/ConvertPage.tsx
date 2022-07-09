@@ -31,7 +31,7 @@ const Header: React.FC<PropsType> = React.memo((props) =>{
 
 const ConvertPage: React.FC =() =>{
 
-    const notify = () => toast.error("Too Big Amount!");
+    const notify = (msg: string) => toast.error(msg);
 
     //  useState Data
     let currencies: Array<string> = ["USD", "EUR", "UAH", "RUB", "CNY"]
@@ -47,7 +47,6 @@ const ConvertPage: React.FC =() =>{
     }
 
     const [loading, setLoading] = useState(true);
-    // const [rates, setRates] = useState({USD:{},EUR:{},UAH:{}});
     const [rates, setRates] = useState(createRatesObject(currencies))
 
     const [currencyOne, setCurrencyOne] = useState({currency: currencies[0], amount: 0})
@@ -76,7 +75,7 @@ const ConvertPage: React.FC =() =>{
                    }
                })
            } catch (error){
-               console.error(error.message);
+               notify(error.message);
            }
         }
 
@@ -96,7 +95,7 @@ const ConvertPage: React.FC =() =>{
             } else if(amountOne === null && amountTwo !== null){
                 return amountTwo / currenciesRate;
             } else {
-                alert("Invalid currency expression")
+                notify("Invalid currency expression")
             }
         }
 
@@ -116,8 +115,7 @@ const ConvertPage: React.FC =() =>{
             }
             case 'inputOne':{
                 if (!inputRegex.test(event.target.value.toString()) && currencyOne.amount < event.target.value) {
-                    console.log(event.target.value)
-                    notify()
+                    notify("Amount is too big")
                     break;
                 } else {
                     setCurrencyOne({currency: currencyOne.currency, amount: event.target.value});
@@ -127,8 +125,7 @@ const ConvertPage: React.FC =() =>{
             }
             case 'inputTwo':{
                 if (!inputRegex.test(event.target.value.toString()) && currencyTwo.amount < event.target.value) {
-                    console.log(event.target.value)
-                    notify()
+                    notify("Amount is too big")
                     break;
                 } else {
                     setCurrencyTwo({currency: currencyTwo.currency, amount: event.target.value});
